@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+ <uses-feature android:name="android.hardware.type.watch"/>
+ <uses-permission android:name="android.permission.INTERNET"/>
+ <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+ <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+ <application android:theme="@style/AppTheme" android:label="오가는 길" android:icon="@drawable/app_icon" android:allowBackup="false" android:usesCleartextTraffic="false">
+  <meta-data android:name="com.google.android.wearable.standalone" android:value="true"/>
+  <activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>
+  <service android:name=".CommuteTileService" android:label="오가는 길" android:exported="true" android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER"><intent-filter><action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER"/></intent-filter></service>
+  <service android:name=".ConfigListener" android:exported="true"><intent-filter><action android:name="com.google.android.gms.wearable.DATA_CHANGED"/><data android:scheme="wear" android:host="*" android:pathPrefix="/commute/config"/></intent-filter></service>
+ </application>
+</manifest>
