@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -21,24 +21,18 @@ jobs:
           java-version: '17'
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
       - name: Install Android SDK packages
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Create development signing key
         run: ./scripts/prepare-dev-key.sh
       - name: Build APKs
         run: ./gradlew --no-daemon :core:domainChecks :wear:assembleDebug :phone:assembleDebug
-      - name: Publish downloadable APK release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          tag="v0.1.2-build${GITHUB_RUN_NUMBER}"
-          gh release create "$tag" \
-            wear/build/outputs/apk/debug/wear-debug.apk#oganeungil-watch-0.1.2.apk \
-            phone/build/outputs/apk/debug/phone-debug.apk#oganeungil-phone-0.1.2.apk \
-            --target "$GITHUB_SHA" \
-            --title "오가는 길 0.1.2 (빌드 ${GITHUB_RUN_NUMBER})" \
-            --notes "키를 포함하지 않은 공개 빌드입니다. 휴대폰 앱에 경기버스 API 키를 직접 입력하세요."
-      - name: Write download link
-        run: |
-          echo "## APK 다운로드" >> "$GITHUB_STEP_SUMMARY"
-          echo "https://github.com/${GITHUB_REPOSITORY}/releases/tag/v0.1.2-build${GITHUB_RUN_NUMBER}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Save build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: apks-build-${{ github.run_number }}
+          path: |
+            wear/build/outputs/apk/debug/wear-debug.apk
+            phone/build/outputs/apk/debug/phone-debug.apk
